@@ -21,15 +21,19 @@ model = AutoModelForCausalLM.from_pretrained(
 
 model.eval()
 
-def run_medgemma(prompt, max_new_tokens=300):  # ✅ using your edited setting
+def run_medgemma(prompt, max_tokens=300):
     with torch.no_grad():
         inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
 
         outputs = model.generate(
             **inputs,
-            max_new_tokens=300,
-            temperature=0.2,
-            do_sample=True
+            max_new_tokens=max_tokens,
+            do_sample=False,              # 🔥 Disable sampling
+            temperature=None,             # 🔥 Remove temperature
+            top_p=None,
+            pad_token_id=tokenizer.eos_token_id,
+            eos_token_id=tokenizer.eos_token_id
         )
 
+        return tokenizer.decode(outputs[0], skip_special_tokens=True)
         return tokenizer.decode(outputs[0], skip_special_tokens=True)
